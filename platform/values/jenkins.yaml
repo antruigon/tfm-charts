@@ -1,0 +1,29 @@
+# Jenkins — footprint mínimo para 1× t3.small
+controller:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  installPlugins:
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - git:latest
+    - configuration-as-code:latest
+    - aws-credentials:latest
+    - pipeline-aws:latest
+  JCasC:
+    defaultConfig: true
+  serviceType: ClusterIP
+  admin:
+    username: admin
+    password: tfm-jenkins-dev
+
+agent:
+  enabled: false
+
+persistence:
+  enabled: false

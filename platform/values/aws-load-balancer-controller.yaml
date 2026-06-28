@@ -1,0 +1,19 @@
+# t3.small: 1 réplica para no saturar límite de pods del nodo
+clusterName: tfm-dev
+region: eu-north-1
+
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+vpcId: ""

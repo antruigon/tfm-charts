@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mcp-server
+description: MCP server mínimo (healthcheck) — TFM
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
