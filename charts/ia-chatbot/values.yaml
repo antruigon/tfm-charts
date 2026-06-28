@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   repository: 565083285597.dkr.ecr.eu-north-1.amazonaws.com/ia-chatbot
-  tag: latest
-  pullPolicy: Always
+  tag: bootstrap
+  pullPolicy: IfNotPresent
 
 secretName: ia-chatbot-secrets
 
