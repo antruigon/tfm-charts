@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: 565083285597.dkr.ecr.eu-north-1.amazonaws.com/mcp-server
-  tag: latest
+  tag: bootstrap
   pullPolicy: IfNotPresent
 
 service:
