@@ -2,4 +2,4 @@ replicaCount: 1
 
 image:
   repository: 565083285597.dkr.ecr.eu-north-1.amazonaws.com/ia-chatbot
-  tag: ab9bac0
+  tag: f039d3b
