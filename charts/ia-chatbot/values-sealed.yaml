@@ -1,0 +1,8 @@
+# Credenciales del chatbot cifradas con kubeseal (seguros para commitear en Git).
+# Regenerar tras terraform destroy o rotación de tokens:
+#   Windows: .\scripts\windows\seal-ia-chatbot-secret.ps1
+#   Linux:   ./scripts/linux/seal-ia-chatbot-secret.sh
+# Requiere: clúster tfm-dev, Fase 2 (operador Sealed Secrets) y kubeseal instalado.
+sealedSecret:
+  enabled: true
+  encryptedData:
