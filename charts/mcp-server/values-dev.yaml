@@ -2,5 +2,5 @@ replicaCount: 1
 
 image:
   repository: 565083285597.dkr.ecr.eu-north-1.amazonaws.com/mcp-server
-  tag: f039d3b
+  tag: 1311d7a
   pullPolicy: IfNotPresent
