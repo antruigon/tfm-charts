@@ -7,9 +7,13 @@ image:
 
 secretName: ia-chatbot-secrets
 
+sealedSecret:
+  enabled: false
+  encryptedData: {}
+
 env:
   MCP_SERVER_URL: "http://mcp-server.apps.svc.cluster.local:8000/mcp"
-  GROQ_MODEL: "llama-3.1-8b-instant"
+  GROQ_MODEL: "llama-3.3-70b-versatile"
   GROQ_BASE_URL: "https://api.groq.com/openai/v1"
   HEALTH_PORT: "8080"
 
