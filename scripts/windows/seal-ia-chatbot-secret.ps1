@@ -1,8 +1,6 @@
 #Requires -Version 5.1
 <#
-.SYNOPSIS
   Genera values-sealed.yaml con credenciales cifradas (kubeseal) para GitOps.
-.NOTES
   Los tokens en texto plano NO se commitean; solo el resultado cifrado.
   Requiere: kubectl, kubeseal, clúster tfm-dev con Sealed Secrets (Fase 2).
 #>
@@ -12,6 +10,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+function Sanitize-Secret([string]$Value) {
+    if ([string]::IsNullOrEmpty($Value)) { return $Value }
+    return ($Value -replace '[\x00-\x1F\x7F]', '').Trim()
+}
 
 if (-not (Get-Command kubeseal -ErrorAction SilentlyContinue)) {
     throw "kubeseal no encontrado. Instálalo con 'choco install kubeseal' o descarga el binario desde https://github.com/bitnami-labs/sealed-secrets/releases"
@@ -24,6 +27,10 @@ $GroqKey = $env:GROQ_API_KEY
 if (-not $BotToken) { $BotToken = Read-Host "SLACK_BOT_TOKEN (xoxb-...)" }
 if (-not $AppToken) { $AppToken = Read-Host "SLACK_APP_TOKEN (xapp-...)" }
 if (-not $GroqKey) { $GroqKey = Read-Host "GROQ_API_KEY (gsk_...)" }
+
+$BotToken = Sanitize-Secret $BotToken
+$AppToken = Sanitize-Secret $AppToken
+$GroqKey = Sanitize-Secret $GroqKey
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Root = Split-Path -Parent (Split-Path -Parent $ScriptDir)

@@ -2,3 +2,9 @@
 Thumbs.db
 .idea/
 .vscode/
+
+# Secretos en texto plano (nunca commitear)
+*-secret-plain.yaml
+*secret-plain*.yaml
+pub-cert.pem
+**/ia-chatbot-secret.yaml
