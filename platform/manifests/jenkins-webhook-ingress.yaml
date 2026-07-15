@@ -1,0 +1,22 @@
+# Ingress público solo para /github-webhook (sin restricción de Host; GitHub usa el DNS del ALB)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins-github-webhook
+  namespace: jenkins
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /github-webhook
+            pathType: Prefix
+            backend:
+              service:
+                name: jenkins
+                port:
+                  number: 8080

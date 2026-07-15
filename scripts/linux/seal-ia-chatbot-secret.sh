@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # Genera values-sealed.yaml con credenciales cifradas (kubeseal) para GitOps.
-# Los tokens en texto plano NO se commitean; solo el resultado cifrado.
-# Requiere: kubectl, kubeseal, clúster tfm-dev con Sealed Secrets (Fase 2).
 set -euo pipefail
 
 command -v kubeseal >/dev/null 2>&1 || {
@@ -27,6 +25,14 @@ fi
 if [[ -z "$GROQ_KEY" ]]; then
   read -r -p "GROQ_API_KEY (gsk_...): " GROQ_KEY
 fi
+
+sanitize_secret() {
+  printf '%s' "$1" | tr -d '\000-\037\177' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
+
+BOT_TOKEN="$(sanitize_secret "$BOT_TOKEN")"
+APP_TOKEN="$(sanitize_secret "$APP_TOKEN")"
+GROQ_KEY="$(sanitize_secret "$GROQ_KEY")"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"

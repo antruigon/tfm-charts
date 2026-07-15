@@ -1,4 +1,4 @@
-# Jenkins — footprint mínimo para 1× t3.small
+# Jenkins — JCasC + webhook GitHub (ALB solo expone /github-webhook/)
 controller:
   replicas: 1
   resources:
@@ -7,16 +7,100 @@ controller:
       memory: 512Mi
     limits:
       cpu: 500m
-      memory: 1Gi
+      memory: 2048Mi
+  startupProbe:
+    failureThreshold: 60
+    periodSeconds: 10
+    timeoutSeconds: 10
   installPlugins:
     - kubernetes:latest
+    - blueocean:latest
+    - pipeline-stage-view:latest
     - workflow-aggregator:latest
     - git:latest
+    - github:latest
+    - github-branch-source:latest
     - configuration-as-code:latest
     - aws-credentials:latest
     - pipeline-aws:latest
+    - job-dsl:latest
+  additionalExistingSecrets:
+    - name: jenkins-aws-creds
+      keyName: access-key
+    - name: jenkins-aws-creds
+      keyName: secret-key
+    - name: jenkins-github-creds
+      keyName: github-user
+    - name: jenkins-github-creds
+      keyName: github-token
+  # URL pública; install-phase3 la actualiza tras crear el ALB
+  jenkinsUrl: http://jenkins-webhook-pending.local/
+  secondaryingress:
+    enabled: false
   JCasC:
     defaultConfig: true
+    configScripts:
+      tfm-credentials: |
+        credentials:
+          system:
+            domainCredentials:
+              - credentials:
+                  - aws:
+                      id: "aws-ecr"
+                      scope: GLOBAL
+                      accessKey: ${jenkins-aws-creds-access-key}
+                      secretKey: ${jenkins-aws-creds-secret-key}
+                  - usernamePassword:
+                      id: "github-tfm-charts"
+                      scope: GLOBAL
+                      username: ${jenkins-github-creds-github-user}
+                      password: ${jenkins-github-creds-github-token}
+                  - usernamePassword:
+                      id: "github-tfm-app"
+                      scope: GLOBAL
+                      username: ${jenkins-github-creds-github-user}
+                      password: ${jenkins-github-creds-github-token}
+      tfm-jobs: |
+        jobs:
+          - script: >
+              multibranchPipelineJob('tfm-app') {
+                displayName('tfm-app')
+                description('CI/CD: test + ECR + actualizar tfm-charts (webhook GitHub)')
+                branchSources {
+                  branchSource {
+                    source {
+                      github {
+                        id('tfm-app-github')
+                        repoOwner('antruigon')
+                        repository('tfm-app')
+                        repositoryUrl('https://github.com/antruigon/tfm-app.git')
+                        configuredByUrl(true)
+                        credentialsId('github-tfm-app')
+                        traits {
+                          gitHubBranchDiscovery {
+                            strategyId(1)
+                          }
+                          headWildcardFilter {
+                            includes('master')
+                            excludes('')
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                factory {
+                  workflowBranchProjectFactory {
+                    scriptPath('Jenkinsfile')
+                  }
+                }
+                orphanedItemStrategy {
+                  discardOldItems {
+                    daysToKeep(7)
+                    numToKeep(10)
+                  }
+                }
+              }
   serviceType: ClusterIP
   admin:
     username: admin
